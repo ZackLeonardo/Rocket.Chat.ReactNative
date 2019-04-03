@@ -2,6 +2,7 @@ import { AsyncStorage } from "react-native";
 import { delay } from "redux-saga";
 import { put, call, take, takeLatest, select, all } from "redux-saga/effects";
 import i18n from "i18n-js";
+import { changeLocale } from "../../main/ran-i18n/redux/actions/localeActions";
 
 import * as types from "../actions/actionsTypes";
 import { appStart } from "../actions";
@@ -23,7 +24,6 @@ import {
 } from "../actions/login";
 import RocketChat from "../lib/rocketchat";
 import log from "../utils/log";
-import { changeLocale } from "../../main/ran-i18n/redux/actions/localeActions";
 
 const getUser = state => state.login.user;
 const getServer = state => state.server.server;
@@ -154,7 +154,9 @@ const handleSetUser = function* handleSetUser() {
     // TODO: temporary... remove in future releases
     // delete user.user;
     if (user.language) {
-      i18n.locale = user.language;
+      yield put(changeLocale(user.language));
+      yield call([AsyncStorage, "setItem"], "locale", user.language);
+      // i18n.locale = user.language;
     }
   }
   yield AsyncStorage.setItem(

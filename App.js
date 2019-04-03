@@ -8,14 +8,11 @@ import {
 } from "react-native";
 import { Localization } from "expo";
 import i18n from "i18n-js";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 import RNChatApp from "./src/src";
 import cn_zh from "./src/main/ran-i18n/lang/zh";
 import en from "./src/main/ran-i18n/lang/en";
-
-i18n.fallbacks = true;
-i18n.translations = { cn_zh, en };
-i18n.locale = Localization.locale.indexOf("zh") > -1 ? "cn_zh" : "en";
 
 class HomeScreen extends React.Component {
   render() {
@@ -49,7 +46,11 @@ export default class App extends React.Component {
   async componentDidMount() {
     const locale = await AsyncStorage.getItem("locale");
     if (locale) {
-      i18n.locale = locale;
+      this.setState({ locale: locale });
+    } else {
+      this.setState({
+        locale: Localization.locale.indexOf("zh") > -1 ? "cn_zh" : "en"
+      });
     }
     this.setState({ isI18nInitialized: true });
   }
@@ -61,7 +62,13 @@ export default class App extends React.Component {
     };
 
     if (this.state.isI18nInitialized) {
-      return <RNChatApp modules={modules} />;
+      return (
+        <RNChatApp
+          locale={this.state.locale}
+          i18nProvider={{ cn_zh, en }}
+          modules={modules}
+        />
+      );
     }
 
     return (
